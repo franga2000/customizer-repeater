@@ -82,7 +82,7 @@ button.social-repeater-general-control-remove-field:hover{
 	color:#00a0d2;
 }
 
-.customizer-repeater-image-control .customizer-repeater-custom-media-button{
+.customizer-repeater-image-control .customizer-repeater-custom-media-button , .customizer-repeater-image-control .customizer-repeater-custom-media-remove {
 	margin-top: 5px;
 }
 

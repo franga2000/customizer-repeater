@@ -134,12 +134,12 @@ class Customizer_Repeater extends WP_Customize_Control {
 					</div>
 					<div class="customizer-repeater-box-content-hidden">
 						<?php
-						$choice = $image_url = $icon_value = $title = $subtitle = $text = $link = $shortcode = $repeater = '';
+						$choice = $image_id = $icon_value = $title = $subtitle = $text = $link = $shortcode = $repeater = '';
 						if(!empty($icon->choice)){
 							$choice = $icon->choice;
 						}
-						if(!empty($icon->image_url)){
-							$image_url = $icon->image_url;
+						if(!empty($icon->image_id)){
+							$image_id = $icon->image_id;
 						}
 						if(!empty($icon->icon_value)){
 							$icon_value = $icon->icon_value;
@@ -168,7 +168,7 @@ class Customizer_Repeater extends WP_Customize_Control {
 							$this->icon_type_choice( $choice );
 						}
 						if($this->customizer_repeater_image_control == true){
-							$this->image_control($image_url, $choice);
+							$this->image_control($image_id, $choice);
 						}
 						if($this->customizer_repeater_icon_control == true){
 							$this->icon_picker_control($icon_value, $choice);
@@ -316,13 +316,21 @@ class Customizer_Repeater extends WP_Customize_Control {
 		<?php
 	}
 
-	private function image_control($value = '', $show = ''){ ?>
+	private function image_control($value = '', $show = '') {
+		$img_url = ( ! empty( $value ) ) ? wp_get_attachment_image_url( absint( $value ), 'medium' ) : false;
+    $hidden = ( ! empty( $img_url ) ) ? '' : 'display:none;';
+    $upload_value = ( ! empty( $img_url ) ) ? esc_html__('Replace Image' ) : esc_html__( 'Upload Image' );
+    ?>
 		<div class="customizer-repeater-image-control" <?php if( $show === 'customizer_repeater_icon' || $show === 'customizer_repeater_none' ) { echo 'style="display:none;"'; } ?>>
             <span class="customize-control-title">
                 <?php esc_html_e('Image','your-textdomain')?>
             </span>
-			<input type="text" class="widefat custom-media-url" value="<?php echo esc_attr( $value ); ?>">
-			<input type="button" class="button button-primary customizer-repeater-custom-media-button" value="<?php esc_html_e('Upload Image','your-textdomain'); ?>" />
+            <div class="customizer-repeater-image-wrapper">
+                <img src="<?php echo esc_url( $img_url ); ?>" alt="" style="<?php echo $hidden;  ?>">
+            </div>
+			<input type="hidden" class="widefat custom-media-url" value="<?php echo esc_attr( $value ); ?>">
+			<input type="button" class="button button-primary customizer-repeater-custom-media-button" value="<?php echo esc_attr( $upload_value ); ?>" />
+		    <input type="button" class="button customizer-repeater-custom-media-remove" value="<?php esc_html_e( 'Remove Image' ); ?>" style="<?php echo ( empty( $img_url ) ) ? 'display:none;' : ''; ?>" />
 		</div>
 		<?php
 	}
