@@ -7,14 +7,14 @@ class Customizer_Repeater extends WP_Customize_Control {
 
 	public $id;
 	private $boxtitle = array();
-	private $customizer_repeater_image_control = false;
-	private $customizer_repeater_icon_control = false;
-	private $customizer_repeater_title_control = false;
-	private $customizer_repeater_subtitle_control = false;
-	private $customizer_repeater_text_control = false;
-	private $customizer_repeater_link_control = false;
-	private $customizer_repeater_shortcode_control = false;
-	private $customizer_repeater_repeater_control = false;
+	private $customizer_repeater_image_control = [ 'label' => 'Image' ];
+	private $customizer_repeater_icon_control = [];
+	private $customizer_repeater_title_control = [];
+	private $customizer_repeater_subtitle_control = [];
+	private $customizer_repeater_text_control = [];
+	private $customizer_repeater_link_control = [];
+	private $customizer_repeater_shortcode_control = [];
+	private $customizer_repeater_repeater_control = [];
 
 	/*Class constructor*/
 	public function __construct( $manager, $id, $args = array() ) {
@@ -25,37 +25,13 @@ class Customizer_Repeater extends WP_Customize_Control {
 			$this->boxtitle = $this->label;
 		}
 
-		if ( ! empty( $args['customizer_repeater_image_control'] ) ) {
-			$this->customizer_repeater_image_control = $args['customizer_repeater_image_control'];
-		}
+		if ( ! isset( $args[ 'controls' ] ) || empty( $args[ 'controls' ] ) ) {
+		    return false;
+        }
 
-		if ( ! empty( $args['customizer_repeater_icon_control'] ) ) {
-			$this->customizer_repeater_icon_control = $args['customizer_repeater_icon_control'];
-		}
-
-		if ( ! empty( $args['customizer_repeater_title_control'] ) ) {
-			$this->customizer_repeater_title_control = $args['customizer_repeater_title_control'];
-		}
-
-		if ( ! empty( $args['customizer_repeater_subtitle_control'] ) ) {
-			$this->customizer_repeater_subtitle_control = $args['customizer_repeater_subtitle_control'];
-		}
-
-		if ( ! empty( $args['customizer_repeater_text_control'] ) ) {
-			$this->customizer_repeater_text_control = $args['customizer_repeater_text_control'];
-		}
-
-		if ( ! empty( $args['customizer_repeater_link_control'] ) ) {
-			$this->customizer_repeater_link_control = $args['customizer_repeater_link_control'];
-		}
-
-		if ( ! empty( $args['customizer_repeater_shortcode_control'] ) ) {
-			$this->customizer_repeater_shortcode_control = $args['customizer_repeater_shortcode_control'];
-		}
-
-		if ( ! empty( $args['customizer_repeater_repeater_control'] ) ) {
-			$this->customizer_repeater_repeater_control = $args['customizer_repeater_repeater_control'];
-		}
+        foreach( $args[ 'controls' ] as $control ) {
+		    $this->{$control[ 'type' ]} = wp_parse_args( $control, $this->{$control[ 'type' ]} );
+        }
 
 		if ( ! empty( $args['id'] ) ) {
 			$this->id = $args['id'];
@@ -316,15 +292,25 @@ class Customizer_Repeater extends WP_Customize_Control {
 		<?php
 	}
 
+	private function description_exists( $settings ) {
+	    return ( isset( $settings[ 'description' ] ) && ! empty( $settings[ 'description' ] ) );
+    }
+
 	private function image_control($value = '', $show = '') {
+	    $settings = $this->customizer_repeater_image_control;
 		$img_url = ( ! empty( $value ) ) ? wp_get_attachment_image_url( absint( $value ), 'medium' ) : false;
-    $hidden = ( ! empty( $img_url ) ) ? '' : 'display:none;';
-    $upload_value = ( ! empty( $img_url ) ) ? esc_html__('Replace Image' ) : esc_html__( 'Upload Image' );
+        $hidden = ( ! empty( $img_url ) ) ? '' : 'display:none;';
+        $upload_value = ( ! empty( $img_url ) ) ? esc_html__('Replace Image' ) : esc_html__( 'Upload Image' );
     ?>
 		<div class="customizer-repeater-image-control" <?php if( $show === 'customizer_repeater_icon' || $show === 'customizer_repeater_none' ) { echo 'style="display:none;"'; } ?>>
             <span class="customize-control-title">
-                <?php esc_html_e('Image','your-textdomain')?>
+                <?php echo esc_html( $settings['label'] ); ?>
             </span>
+            <?php if ( $this->description_exists( $settings ) ) : ?>
+                <span class="customize-control-description">
+                <?php echo esc_html( $settings['description'] ); ?>
+            </span>
+            <?php endif; ?>
             <div class="customizer-repeater-image-wrapper">
                 <img src="<?php echo esc_url( $img_url ); ?>" alt="" style="<?php echo $hidden;  ?>">
             </div>
