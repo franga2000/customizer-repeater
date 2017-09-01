@@ -15,4 +15,9 @@ if ( !defined( 'CUSTOMIZER_REPEATER_VERSION' ) ) {
 	define( 'CUSTOMIZER_REPEATER_VERSION', '0.4.0' );
 }
 
-require CUSTOMIZER_REPEATER_DIR . '/customizer-repeater/inc/customizer.php';
+function customizer_repeater_register( $wp_customize ) {
+	require_once( CUSTOMIZER_REPEATER_DIR .'/class/customizer-repeater-control.php' );
+}
+add_action( 'customize_register', 'customizer_repeater_register' );
+
+require CUSTOMIZER_REPEATER_DIR . '/inc/customizer.php';
