@@ -108,46 +108,69 @@ function customizer_repeater_refresh_social_icons(th) {
 
 
 function customizer_repeater_refresh_general_control_values() {
-    'use strict';
-    jQuery('.customizer-repeater-general-control-repeater').each(function () {
-        var values = [];
-        var th = jQuery(this);
-        th.find('.customizer-repeater-general-control-repeater-container').each(function () {
+    var repeaters = document.querySelectorAll( '.customizer-repeater-general-control-repeater-container' );
+    var hiddenEl = document.getElementById( 'customizer-repeater-hero_slider-colector' );
 
-            var icon_value = jQuery(this).find('.icp').val();
-            var text = jQuery(this).find('.customizer-repeater-text-control').val();
-            var link = jQuery(this).find('.customizer-repeater-link-control').val();
-            var image_id = jQuery(this).find('.custom-media-url').val();
-            var choice = jQuery(this).find('.customizer-repeater-image-choice').val();
-            var title = jQuery(this).find('.customizer-repeater-title-control').val();
-            var subtitle = jQuery(this).find('.customizer-repeater-subtitle-control').val();
-            var id = jQuery(this).find('.social-repeater-box-id').val();
-            if (!id) {
-                id = 'social-repeater-' + customizer_repeater_uniqid();
-                jQuery(this).find('.social-repeater-box-id').val(id);
-            }
-            var social_repeater = jQuery(this).find('.social-repeater-socials-repeater-colector').val();
-            var shortcode = jQuery(this).find('.customizer-repeater-shortcode-control').val();
+    if ( 0 === repeaters.length ) {
+      return false;
+    }
 
-            if (text !== '' || image_url !== '' || title !== '' || subtitle !== '' || icon_value !== '' || link !== '' || choice !== '' || social_repeater !== '' || shortcode !== '') {
-                values.push({
-                    'icon_value': (choice === 'customizer_repeater_none' ? '' : icon_value),
-                    'text': escapeHtml(text),
-                    'link': link,
-                    'image_id': (choice === 'customizer_repeater_none' ? '' : image_id),
-                    'choice': choice,
-                    'title': escapeHtml(title),
-                    'subtitle': escapeHtml(subtitle),
-                    'social_repeater': escapeHtml(social_repeater),
-                    'id': id,
-                    'shortcode': escapeHtml(shortcode)
-                });
-            }
+    var values = [].map.call( repeaters, function( repeater ) {
+      var hiddenEl = repeater.nextElementSibling;
+      var inputs = repeater.querySelectorAll('.repeater-value');
 
-        });
-        th.find('.customizer-repeater-colector').val(JSON.stringify(values));
-        th.find('.customizer-repeater-colector').trigger('change');
+      if ( 0 === inputs.length ) {
+        return false;
+      }
+
+      return [].reduce.call( inputs, function(acc, el) {
+        acc[el.dataset.id] = el.value;
+        return acc;
+      }, {} );
     });
+//
+    hiddenEl.value = JSON.stringify( values );
+    jQuery( hiddenEl ).trigger( 'change' );
+
+    // jQuery('.customizer-repeater-general-control-repeater').each(function () {
+    //     var values = [];
+    //     var th = jQuery(this);
+    //     th.find('.customizer-repeater-general-control-repeater-container').each(function () {
+    //
+    //         var icon_value = jQuery(this).find('.icp').val();
+    //         var text = jQuery(this).find('.customizer-repeater-text-control').val();
+    //         var link = jQuery(this).find('.customizer-repeater-link-control').val();
+    //         var image_id = jQuery(this).find('.custom-media-url').val();
+    //         var choice = jQuery(this).find('.customizer-repeater-image-choice').val();
+    //         var title = jQuery(this).find('.customizer-repeater-title-control').val();
+    //         var subtitle = jQuery(this).find('.customizer-repeater-subtitle-control').val();
+    //         var id = jQuery(this).find('.social-repeater-box-id').val();
+    //         if (!id) {
+    //             id = 'social-repeater-' + customizer_repeater_uniqid();
+    //             jQuery(this).find('.social-repeater-box-id').val(id);
+    //         }
+    //         var social_repeater = jQuery(this).find('.social-repeater-socials-repeater-colector').val();
+    //         var shortcode = jQuery(this).find('.customizer-repeater-shortcode-control').val();
+    //
+    //         if (text !== '' || image_id !== '' || title !== '' || subtitle !== '' || icon_value !== '' || link !== '' || choice !== '' || social_repeater !== '' || shortcode !== '') {
+    //             values.push({
+    //                 'icon_value': (choice === 'customizer_repeater_none' ? '' : icon_value),
+    //                 'text': escapeHtml(text),
+    //                 'link': link,
+    //                 'image_id': (choice === 'customizer_repeater_none' ? '' : image_id),
+    //                 'choice': choice,
+    //                 'title': escapeHtml(title),
+    //                 'subtitle': escapeHtml(subtitle),
+    //                 'social_repeater': escapeHtml(social_repeater),
+    //                 'id': id,
+    //                 'shortcode': escapeHtml(shortcode)
+    //             });
+    //         }
+    //
+    //     });
+    //     th.find('.customizer-repeater-colector').val(JSON.stringify(values));
+    //     th.find('.customizer-repeater-colector').trigger('change');
+    // });
 }
 
 
@@ -214,75 +237,127 @@ jQuery(document).ready(function () {
      * This adds a new box to repeater
      *
      */
-    theme_conrols.on('click', '.customizer-repeater-new-field', function () {
-        var th = jQuery(this).parent();
+    var addNewButton = document.querySelectorAll( '.customizer-repeater-new-field' );
+    [].forEach.call( addNewButton, function( element ) {
+      element.addEventListener( 'click', function(e) {
+        var parent = e.target.parentNode;
+
         var id = 'customizer-repeater-' + customizer_repeater_uniqid();
-        if (typeof th !== 'undefined') {
-            /* Clone the first box*/
-            var field = th.find('.customizer-repeater-general-control-repeater-container:first').clone();
 
-            if (typeof field !== 'undefined') {
-                /*Set the default value for choice between image and icon to icon*/
-                field.find('.customizer-repeater-image-choice').val('customizer_repeater_icon');
-
-                /*Show icon selector*/
-                field.find('.social-repeater-general-control-icon').show();
-
-                /*Hide image selector*/
-                if (field.find('.social-repeater-general-control-icon').length > 0) {
-                    field.find('.customizer-repeater-image-control').hide();
-                }
-
-                /*Show delete box button because it's not the first box*/
-                field.find('.social-repeater-general-control-remove-field').show();
-
-                /* Empty control for icon */
-                field.find( '.icp' ).iconpicker().on( 'iconpickerUpdated', function() {
-                    jQuery( this ).trigger( 'change' );
-                } );
-                field.find( '.input-group-addon' ).find('.fa').attr('class','fa');
-
-
-                /*Remove all repeater fields except first one*/
-
-                field.find('.customizer-repeater-social-repeater').find('.customizer-repeater-social-repeater-container').not(':first').remove();
-                field.find('.customizer-repeater-social-repeater-link').val('');
-                field.find('.social-repeater-socials-repeater-colector').val('');
-
-                /*Remove value from icon field*/
-                field.find('.icp').val('');
-
-                /*Remove value from text field*/
-                field.find('.customizer-repeater-text-control').val('');
-
-                /*Remove value from link field*/
-                field.find('.customizer-repeater-link-control').val('');
-
-                /*Set box id*/
-                field.find('.social-repeater-box-id').val(id);
-
-                /*Remove value from media field*/
-                field.find('.custom-media-url').val('');
-
-                /*Remove value from title field*/
-                field.find('.customizer-repeater-title-control').val('');
-
-                /*Remove value from subtitle field*/
-                field.find('.customizer-repeater-subtitle-control').val('');
-
-                /*Remove value from shortcode field*/
-                field.find('.customizer-repeater-shortcode-control').val('');
-
-                /*Append new box*/
-                th.find('.customizer-repeater-general-control-repeater-container:first').parent().append(field);
-
-                /*Refresh values*/
-                customizer_repeater_refresh_general_control_values();
-            }
-
+        if ( ! parent ) {
+          return false;
         }
-        return false;
-    });
+
+        var firstRepeater = parent.querySelector('.customizer-repeater-general-control-repeater-container');
+
+        if ( ! firstRepeater ) {
+          return false;
+        }
+
+        var newRepeater = firstRepeater.cloneNode(true);
+
+        var newRepeaterDelete = newRepeater.querySelector('.social-repeater-general-control-remove-field');
+        newRepeaterDelete.style.display = 'line-block';
+
+        var inputFields = newRepeater.querySelectorAll('.repeater-value');
+
+        [].forEach.call( inputFields, function( field ) {
+          field.value = '';
+
+          if ( field.classList.contains( 'custom-media-url' ) ) {
+            var imageParent = field.parentNode;
+            var image = imageParent.querySelector('img');
+            var uploadBtn = imageParent.querySelector('.customizer-repeater-custom-media-button');
+            var cancelBtn = imageParent.querySelector('.customizer-repeater-custom-media-remove');
+
+            image.setAttribute('src', '');
+            image.style.display = 'none';
+            uploadBtn.value = 'Upload Image';
+            cancelBtn.style.display = 'none';
+          }
+        } );
+
+        /*Append new box*/
+        parent.insertBefore(newRepeater, e.target);
+
+        /*Refresh values*/
+        // customizer_repeater_refresh_general_control_values();
+      } );
+    } );
+
+    // theme_conrols.on('click', '.customizer-repeater-new-field', function () {
+    //   var parent = jQuery(this).parent();
+    //
+    //
+    //
+    //     var th = jQuery(this).parent();
+    //     var id = 'customizer-repeater-' + customizer_repeater_uniqid();
+    //     if (typeof th !== 'undefined') {
+    //         /* Clone the first box*/
+    //         var field = th.find('.customizer-repeater-general-control-repeater-container:first').clone();
+    //
+    //         if (typeof field !== 'undefined') {
+    //             /*Set the default value for choice between image and icon to icon*/
+    //             field.find('.customizer-repeater-image-choice').val('customizer_repeater_icon');
+    //
+    //             /*Show icon selector*/
+    //             field.find('.social-repeater-general-control-icon').show();
+    //
+    //             /*Hide image selector*/
+    //             if (field.find('.social-repeater-general-control-icon').length > 0) {
+    //                 field.find('.customizer-repeater-image-control').hide();
+    //             }
+    //
+    //             /*Show delete box button because it's not the first box*/
+    //             field.find('.social-repeater-general-control-remove-field').show();
+    //
+    //             /* Empty control for icon */
+    //             field.find( '.icp' ).iconpicker().on( 'iconpickerUpdated', function() {
+    //                 jQuery( this ).trigger( 'change' );
+    //             } );
+    //             field.find( '.input-group-addon' ).find('.fa').attr('class','fa');
+    //
+    //
+    //             /*Remove all repeater fields except first one*/
+    //
+    //             field.find('.customizer-repeater-social-repeater').find('.customizer-repeater-social-repeater-container').not(':first').remove();
+    //             field.find('.customizer-repeater-social-repeater-link').val('');
+    //             field.find('.social-repeater-socials-repeater-colector').val('');
+    //
+    //             /*Remove value from icon field*/
+    //             field.find('.icp').val('');
+    //
+    //             /*Remove value from text field*/
+    //             field.find('.customizer-repeater-text-control').val('');
+    //
+    //             /*Remove value from link field*/
+    //             field.find('.customizer-repeater-link-control').val('');
+    //
+    //             /*Set box id*/
+    //             field.find('.social-repeater-box-id').val(id);
+    //
+    //             /*Remove value from media field*/
+    //             field.find('.custom-media-url').val('');
+    //
+    //             /*Remove value from title field*/
+    //             field.find('.customizer-repeater-title-control').val('');
+    //
+    //             /*Remove value from subtitle field*/
+    //             field.find('.customizer-repeater-subtitle-control').val('');
+    //
+    //             /*Remove value from shortcode field*/
+    //             field.find('.customizer-repeater-shortcode-control').val('');
+    //
+    //             /*Append new box*/
+    //             th.find('.customizer-repeater-general-control-repeater-container:first').parent().append(field);
+    //
+    //             /*Refresh values*/
+    //             // customizer_repeater_refresh_general_control_values();
+    //         }
+    //
+    //     }
+    //     return false;
+    // });
 
 
     theme_conrols.on('click', '.social-repeater-general-control-remove-field', function () {

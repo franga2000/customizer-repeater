@@ -6,32 +6,25 @@ if ( ! class_exists( 'WP_Customize_Control' ) ) {
 class Customizer_Repeater extends WP_Customize_Control {
 
 	public $id;
-	private $boxtitle = array();
-	private $customizer_repeater_image_control = [ 'label' => 'Image' ];
-	private $customizer_repeater_icon_control = [];
-	private $customizer_repeater_title_control = [];
-	private $customizer_repeater_subtitle_control = [];
-	private $customizer_repeater_text_control = [];
-	private $customizer_repeater_link_control = [];
-	private $customizer_repeater_shortcode_control = [];
-	private $customizer_repeater_repeater_control = [];
+	private $repeater_title = array();
+	private $controls;
 
 	/*Class constructor*/
 	public function __construct( $manager, $id, $args = array() ) {
 		parent::__construct( $manager, $id, $args );
 		/*Get options from customizer.php*/
-		$this->boxtitle   = __('Cusomizer Repeater','your-textdomain');
-		if ( ! empty( $this->label ) ){
-			$this->boxtitle = $this->label;
-		}
 
-		if ( ! isset( $args[ 'controls' ] ) || empty( $args[ 'controls' ] ) ) {
-		    return false;
+		if ( ! isset( $this->label ) || empty( $this->label ) ) {
+		    throw new Exception( 'Missing Label Field for Customizer Repeater' );
         }
 
-        foreach( $args[ 'controls' ] as $control ) {
-		    $this->{$control[ 'type' ]} = wp_parse_args( $control, $this->{$control[ 'type' ]} );
+        if ( ! isset( $args['controls'] ) || empty( $args['controls'] ) ) {
+	        throw new Exception( 'You did not pass any controls to Customizer Repeater' );
         }
+
+		$this->repeater_title = $this->label;
+		//TODO need to set default sanitization functions.
+		$this->controls = $args[ 'controls' ];
 
 		if ( ! empty( $args['id'] ) ) {
 			$this->id = $args['id'];
@@ -55,43 +48,19 @@ class Customizer_Repeater extends WP_Customize_Control {
 
 	public function render_content() {
 
-		/*Get default options*/
-		$this_default = json_decode( $this->setting->default );
-
 		/*Get values (json format)*/
 		$values = $this->value();
 
 		/*Decode values*/
-		$json = json_decode( $values );
-
-		if ( ! is_array( $json ) ) {
-			$json = array( $values );
-		} ?>
+		$values = json_decode( $values );
+        ?>
 
 		<span class="customize-control-title"><?php echo esc_html( $this->label ); ?></span>
 		<div class="customizer-repeater-general-control-repeater customizer-repeater-general-control-droppable">
-			<?php
-			if ( ( count( $json ) == 1 && '' === $json[0] ) || empty( $json ) ) {
-				if ( ! empty( $this_default ) ) {
-					$this->iterate_array( $this_default ); ?>
-					<input type="hidden"
-					       id="customizer-repeater-<?php echo $this->id; ?>-colector" <?php $this->link(); ?>
-					       class="customizer-repeater-colector"
-					       value="<?php echo esc_textarea( json_encode( $this_default ) ); ?>"/>
-					<?php
-				} else {
-					$this->iterate_array(); ?>
-					<input type="hidden"
-					       id="customizer-repeater-<?php echo $this->id; ?>-colector" <?php $this->link(); ?>
-					       class="customizer-repeater-colector"/>
-					<?php
-				}
-			} else {
-				$this->iterate_array( $json ); ?>
-				<input type="hidden" id="customizer-repeater-<?php echo $this->id; ?>-colector" <?php $this->link(); ?>
-				       class="customizer-repeater-colector" value="<?php echo esc_textarea( $this->value() ); ?>"/>
-				<?php
-			} ?>
+			<?php $this->output_repeater_section( $values ); ?>
+            <input type="hidden"
+                   id="customizer-repeater-<?php echo $this->id; ?>-colector" <?php $this->link(); ?>
+                   class="customizer-repeater-colector"/>
 			</div>
 		<button type="button" class="button add_field customizer-repeater-new-field">
 			<?php esc_html_e( 'Add new field', 'your-textdomain' ); ?>
@@ -99,178 +68,74 @@ class Customizer_Repeater extends WP_Customize_Control {
 		<?php
 	}
 
-	private function iterate_array($array = array()){
-		/*Counter that helps checking if the box is first and should have the delete button disabled*/
-		$it = 0;
-		if(!empty($array)){
-			foreach($array as $icon){ ?>
-				<div class="customizer-repeater-general-control-repeater-container customizer-repeater-draggable">
-					<div class="customizer-repeater-customize-control-title">
-						<?php esc_html_e( $this->boxtitle, 'your-textdomain' ) ?>
-					</div>
-					<div class="customizer-repeater-box-content-hidden">
-						<?php
-						$choice = $image_id = $icon_value = $title = $subtitle = $text = $link = $shortcode = $repeater = '';
-						if(!empty($icon->choice)){
-							$choice = $icon->choice;
-						}
-						if(!empty($icon->image_id)){
-							$image_id = $icon->image_id;
-						}
-						if(!empty($icon->icon_value)){
-							$icon_value = $icon->icon_value;
-						}
-						if(!empty($icon->title)){
-							$title = $icon->title;
-						}
-						if(!empty($icon->subtitle)){
-							$subtitle =  $icon->subtitle;
-						}
-						if(!empty($icon->text)){
-							$text = $icon->text;
-						}
-						if(!empty($icon->link)){
-							$link = $icon->link;
-						}
-						if(!empty($icon->shortcode)){
-							$shortcode = $icon->shortcode;
-						}
-
-						if(!empty($icon->social_repeater)){
-							$repeater = $icon->social_repeater;
-						}
-
-						if($this->customizer_repeater_image_control == true && $this->customizer_repeater_icon_control == true) {
-							$this->icon_type_choice( $choice );
-						}
-						if($this->customizer_repeater_image_control == true){
-							$this->image_control($image_id, $choice);
-						}
-						if($this->customizer_repeater_icon_control == true){
-							$this->icon_picker_control($icon_value, $choice);
-						}
-						if($this->customizer_repeater_title_control==true){
-							$this->input_control(array(
-								'label' => __('Title','your-textdomain'),
-								'class' => 'customizer-repeater-title-control',
-							), $title);
-						}
-						if($this->customizer_repeater_subtitle_control==true){
-							$this->input_control(array(
-								'label' => __('Subtitle','your-textdomain'),
-								'class' => 'customizer-repeater-subtitle-control',
-							), $subtitle);
-						}
-						if($this->customizer_repeater_text_control==true){
-							$this->input_control(array(
-								'label' => __('Text','your-textdomain'),
-								'class' => 'customizer-repeater-text-control',
-								'type'  => 'textarea'
-							), $text);
-						}
-						if($this->customizer_repeater_link_control){
-							$this->input_control(array(
-								'label' => __('Link','your-textdomain'),
-								'class' => 'customizer-repeater-link-control',
-								'sanitize_callback' => 'esc_url'
-							), $link);
-						}
-						if($this->customizer_repeater_shortcode_control==true){
-							$this->input_control(array(
-								'label' => __('Shortcode','your-textdomain'),
-								'class' => 'customizer-repeater-shortcode-control',
-							), $shortcode);
-						}
-						if($this->customizer_repeater_repeater_control==true){
-							$this->repeater_control($repeater);
-						} ?>
-
-						<input type="hidden" class="social-repeater-box-id" value="<?php if ( ! empty( $this->id ) ) {
-							echo esc_attr( $this->id );
-						} ?>">
-						<button type="button" class="social-repeater-general-control-remove-field button" <?php if ( $it == 0 ) {
-							echo 'style="display:none;"';
-						} ?>>
-							<?php esc_html_e( 'Delete field', 'your-textdomain' ); ?>
-						</button>
-
-					</div>
-				</div>
-
-				<?php
-				$it++;
-			}
-		} else { ?>
-			<div class="customizer-repeater-general-control-repeater-container">
-				<div class="customizer-repeater-customize-control-title">
-					<?php esc_html_e( $this->boxtitle, 'your-textdomain' ) ?>
-				</div>
-				<div class="customizer-repeater-box-content-hidden">
-					<?php
-					if ( $this->customizer_repeater_image_control == true && $this->customizer_repeater_icon_control == true ) {
-						$this->icon_type_choice();
-					}
-					if ( $this->customizer_repeater_image_control == true ) {
-						$this->image_control();
-					}
-					if ( $this->customizer_repeater_icon_control == true ) {
-						$this->icon_picker_control();
-					}
-					if ( $this->customizer_repeater_title_control == true ) {
-						$this->input_control( array(
-							'label' => __( 'Title', 'your-textdomain' ),
-							'class' => 'customizer-repeater-title-control',
-						) );
-					}
-					if ( $this->customizer_repeater_subtitle_control == true ) {
-						$this->input_control( array(
-							'label' => __( 'Subtitle', 'your-textdomain' ),
-							'class' => 'customizer-repeater-subtitle-control'
-						) );
-					}
-					if ( $this->customizer_repeater_text_control == true ) {
-						$this->input_control( array(
-							'label' => __( 'Text', 'your-textdomain' ),
-							'class' => 'customizer-repeater-text-control',
-							'type'  => 'textarea'
-						) );
-					}
-					if ( $this->customizer_repeater_link_control == true ) {
-						$this->input_control( array(
-							'label' => __( 'Link', 'your-textdomain' ),
-							'class' => 'customizer-repeater-link-control'
-						) );
-					}
-					if ( $this->customizer_repeater_shortcode_control == true ) {
-						$this->input_control( array(
-							'label' => __( 'Shortcode', 'your-textdomain' ),
-							'class' => 'customizer-repeater-shortcode-control'
-						) );
-					}
-					if($this->customizer_repeater_repeater_control==true){
-						$this->repeater_control();
-					} ?>
-					<input type="hidden" class="social-repeater-box-id">
-					<button type="button" class="social-repeater-general-control-remove-field button" style="display:none;">
+	private function output_repeater_section( $values ) {
+		$num_repeaters = ( 0 === count( $values ) ) ? 1 :  ( count( $values ) );
+        $counter = 0;
+		while( $counter < $num_repeaters ) : ?>
+            <div class="customizer-repeater-general-control-repeater-container customizer-repeater-draggable">
+                <div class="customizer-repeater-customize-control-title">
+					<?php echo esc_html( $this->repeater_title ); ?>
+                </div>
+                <div class="customizer-repeater-box-content-hidden">
+					<?php $this->output_repeater_setting( (array) $values[ $counter ] ); ?>
+                    <input type="hidden" class="social-repeater-box-id" value="<?php if ( ! empty( $this->id ) ) {
+						echo esc_attr( $this->id );
+					} ?>">
+                    <button type="button" class="social-repeater-general-control-remove-field button" >
 						<?php esc_html_e( 'Delete field', 'your-textdomain' ); ?>
-					</button>
-				</div>
-			</div>
+                    </button>
+
+                </div>
+            </div>
+			<?php $counter++;
+        endwhile;
+	}
+
+	private function output_repeater_setting( $values ) {
+	    $text_controls = [ 'text', 'textarea', 'url' ];
+        foreach( $this->controls as $control ) {
+            if ( in_array( $control['type'], $text_controls ) ) {
+	            echo $this->input_control( $control, $values );
+            } else if ( 'image' === $control['type'] ) {
+                echo $this->image_control( $control, $values );
+            }
+        }
+    }
+
+	private function input_control( $options, $values ) {
+	    $class = $this->get_control_class_name( $options[ 'type' ] );
+	    $value = ( ! empty( $values[$options['id'] ] ) ) ? $values[$options['id'] ] : false;
+	    ?>
+		<span class="customize-control-item"><?php echo esc_html( $options['label'] ); ?></span>
+		<?php
+		if( $options['type'] === 'textarea' ){ ?>
+			<textarea
+                class="<?php echo esc_attr( $class ); ?>"
+                placeholder="<?php echo esc_attr( $options['label'] ); ?>"
+                data-id="<?php echo esc_attr( $options['id'] ) ?>"><?php echo ( ! empty($options['sanitize_callback'] ) ?  call_user_func_array( $options['sanitize_callback'], array( $value ) ) : esc_attr($value) ); ?></textarea>
+			<?php
+		} else { ?>
+            <input
+                type="text"
+                value="<?php echo esc_attr( $value ); ?>"
+                class="<?php echo esc_attr( $class ); ?>"
+                placeholder="<?php echo esc_attr( $options['label'] ); ?>"
+                data-id="<?php echo esc_attr( $options['id'] ) ?>"
+            />
 			<?php
 		}
 	}
 
-	private function input_control( $options, $value='' ){ ?>
-		<span class="customize-control-title"><?php echo $options['label']; ?></span>
-		<?php
-		if( !empty($options['type']) && $options['type'] === 'textarea' ){ ?>
-			<textarea class="<?php echo esc_attr($options['class']); ?>" placeholder="<?php echo $options['label']; ?>"><?php echo ( !empty($options['sanitize_callback']) ?  call_user_func_array( $options['sanitize_callback'], array( $value ) ) : esc_attr($value) ); ?></textarea>
-			<?php
-		} else { ?>
-			<input type="text" value="<?php echo ( !empty($options['sanitize_callback']) ?  call_user_func_array( $options['sanitize_callback'], array( $value ) ) : esc_attr($value) ); ?>" class="<?php echo esc_attr($options['class']); ?>" placeholder="<?php echo $options['label']; ?>"/>
-			<?php
+	private function get_control_class_name( $type ) {
+		switch ( $type ) {
+			case 'text':
+				return 'customizer-repeater-title-control repeater-value';
+			case 'textarea':
+				return 'customizer-repeater-text-control repeater-value';
+			case 'url':
+				return 'customizer-repeater-link-control repeater-value';
 		}
-	}
+    }
 
 	private function icon_picker_control($value = '', $show = ''){ ?>
 		<div class="social-repeater-general-control-icon" <?php if( $show === 'customizer_repeater_image' || $show === 'customizer_repeater_none' ) { echo 'style="display:none;"'; } ?>>
@@ -296,25 +161,25 @@ class Customizer_Repeater extends WP_Customize_Control {
 	    return ( isset( $settings[ 'description' ] ) && ! empty( $settings[ 'description' ] ) );
     }
 
-	private function image_control($value = '', $show = '') {
-	    $settings = $this->customizer_repeater_image_control;
+	private function image_control( $options, $values ) {
+        $value = ( ! empty( $values[ $options['id'] ] ) ) ? $values[ $options['id'] ] : false;
 		$img_url = ( ! empty( $value ) ) ? wp_get_attachment_image_url( absint( $value ), 'medium' ) : false;
         $hidden = ( ! empty( $img_url ) ) ? '' : 'display:none;';
         $upload_value = ( ! empty( $img_url ) ) ? esc_html__('Replace Image' ) : esc_html__( 'Upload Image' );
     ?>
-		<div class="customizer-repeater-image-control" <?php if( $show === 'customizer_repeater_icon' || $show === 'customizer_repeater_none' ) { echo 'style="display:none;"'; } ?>>
+		<div class="customizer-repeater-image-control">
             <span class="customize-control-title">
-                <?php echo esc_html( $settings['label'] ); ?>
+                <?php echo esc_html( $options['label'] ); ?>
             </span>
-            <?php if ( $this->description_exists( $settings ) ) : ?>
+            <?php if ( $this->description_exists( $options ) ) : ?>
                 <span class="customize-control-description">
-                <?php echo esc_html( $settings['description'] ); ?>
+                <?php echo esc_html( $options['description'] ); ?>
             </span>
             <?php endif; ?>
             <div class="customizer-repeater-image-wrapper">
                 <img src="<?php echo esc_url( $img_url ); ?>" alt="" style="<?php echo $hidden;  ?>">
             </div>
-			<input type="hidden" class="widefat custom-media-url" value="<?php echo esc_attr( $value ); ?>">
+			<input type="hidden" class="widefat custom-media-url repeater-value" value="<?php echo esc_attr( $value ); ?>" data-id="<?php echo esc_attr( $options['id'] ) ?>">
 			<input type="button" class="button button-primary customizer-repeater-custom-media-button" value="<?php echo esc_attr( $upload_value ); ?>" />
 		    <input type="button" class="button customizer-repeater-custom-media-remove" value="<?php esc_html_e( 'Remove Image' ); ?>" style="<?php echo ( empty( $img_url ) ) ? 'display:none;' : ''; ?>" />
 		</div>
