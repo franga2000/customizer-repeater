@@ -135,3 +135,5 @@ Customizer Repeater saves the selected image's ID. So when loop through the data
 * Allow you to change image upload button text from always being 'Image'.
 * Allow the ability to pass custom sanitization callbacks for each control.
 * Add hooks and filter to make repeater more customizable
+* Create autosuggest field.
+* Allow you the abilty to limit the number of repeaters a user can make.
