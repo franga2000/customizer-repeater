@@ -6,78 +6,132 @@ Customizer Repeater is a custom control for the WordPress Theme Customizer. It's
 
 ## How to install?
 
-To install Customizer repeater copy the folder in the root of your theme and add the following line in functions.php, before you call your customizer.php file.
+### (Option 1) Use composer.
 
-         require get_template_directory() . '/customizer-repeater/functions.php';
-         /**
-          * Do not include twice the file below.
-          */
-         require get_template_directory() . '/inc/customizer.php';
+Step 1: Add customizer repeater to composer.json repositories section.
 
-After you did this there's only one step left. Replace 'your-textdomain' textdomain with yours.
-That's all
+         "repositories" : [
+         		{
+         			"type": "vcs",
+         			"url": "https://github.com/mrbobbybryant/customizer-repeater"
+         		}
+         	]
 
-## How to use? (backend-part)
+Step 2: Add Composer Autoload Call to your functions.php if you havn't already.
+ 
+         if ( file_exists( get_template_directory() . '/vendor/autoload.php' ) ) {
+            require( 'vendor/autoload.php' );
+         }
 
-There are eight types of fields that you can add in a box: (`customizer_repeater_image_control`), (`customizer_repeater_icon_control`), (`customizer_repeater_title_control`), (`customizer_repeater_subtitle_control`), (`customizer_repeater_text_control`), (`customizer_repeater_link_control`), (`customizer_repeater_shortcode_control`), (`customizer_repeater_repeater_control`). To choose what your repeater will look, just enable fields in your control's oprions. Here's an example, add the following code in your theme's customizer.php:
+Step 3: Run `composer update or composer install`
+
+### (Option 2) Clone Github repo
+
+Step 1: Clone repo into you theme folder.
+ 
+         git clone https://github.com/mrbobbybryant/customizer-repeater.git
+
+Step 2: Require root file for customizer-repeater in you `functions.php` file.
+
+         if ( file_exists( get_template_directory() . '/vendor/autoload.php' ) ) {
+            require_once get_template_directory() . '/customizer-repeater/customizer-repeater.php';
+         }
+
+## How to use?
+
+Step 1: Create a customizer setting. This is done the normal way.
 
           $wp_customize->add_setting( 'customizer_repeater_example', array(
              'sanitize_callback' => 'customizer_repeater_sanitize'
           ));
-          $wp_customize->add_control( new Customizer_Repeater( $wp_customize, 'customizer_repeater_example', array(
-		'label'   => esc_html__('Example','customizer-repeater'),
-		'section' => 'my_section',
-		'priority' => 1,
-		'customizer_repeater_image_control' => true,
-		'customizer_repeater_icon_control' => true,
-		'customizer_repeater_title_control' => true,
-		'customizer_repeater_subtitle_control' => true,
-		'customizer_repeater_text_control' => true,
-		'customizer_repeater_link_control' => true,
-		'customizer_repeater_shortcode_control' => true,
-		'customizer_repeater_repeater_control' => true
-	 ) ) );
 
+Step 2: Create a control using the Customizer Repeater field.
 
-Customizer Repeater also supports default input. If you want to add default input for your repeater here's how you do it:
+         $manager->add_control( new Customizer_Repeater( $manager, 'text_slider', array(
+             'label'   => esc_html__( 'Text Slider','drb' ),
+             'section' => 'text_slider_section',
+             'priority' => 1,
+             'controls' => [
+                 [
+                     'type'  => 'text',
+                     'id'    => 'title',
+                     'label' =>  esc_html__( 'Text Slide Title', 'text-domain' )
+                 ],
+                 [
+                     'type'  =>  'url',
+                     'id'    =>  'link',
+                     'label' =>  esc_html__( 'Text Slide Link', 'text-domain' )
+                 ],
+                 [
+                     'type'  =>  'textarea',
+                     'id'    =>  'text',
+                     'label' =>  esc_html__( 'Text Slide Description', 'text-domain' )
+                 ],
+                 [
+                     'type'  =>  'image',
+                     'label' =>  esc_html__( 'Slide Image', 'text-domain' ),
+                     'id'    =>  'image',
+                     'description'   =>  esc_html__( 'Slider Background Image', 'text-domain' )
+                 ],
+             ]
+             ) ) );
 
-         $wp_customize->add_setting( 'customizer_repeater_example', array(
-             'sanitize_callback' => 'customizer_repeater_sanitize',
-             'default' => json_encode( array(
-                /*Repeater's first item*/
-                array("image_url" => get_template_directory_uri().'/images/companies/1.png' ,"link" => "#", "id" => "customizer_repeater_56d7ea7f40f56" ), //every item in default string should have an unique id, it helps for translation
-                /*Repeater's second item*/
-                array("image_url" => get_template_directory_uri().'/images/companies/1.png' ,"link" => "#", "id" => "customizer_repeater_56d7ea7f40f57" ),
-                /*Repeater's third item*/
-                array("image_url" => get_template_directory_uri().'/images/companies/1.png' ,"link" => "#", "id" => "customizer_repeater_56d7ea7f40f58" ),
-                ) )
-         ) );
+### Currently the Customizer Repeater supports the following field types:
+* Text Field
+* Link Field
+* Textarea
+* Image/Attachment Upload Field
 
+### Lets break down one of the controls above.
+`'type' => 'image'` - This is the type of field you want to use.
 
-## How to use? (frontend-part)
+`'label' =>  esc_html__( 'Slide Image', 'text-domain' ),` - This is the label that will appear by the field in the repeater.
+
+`'id'    =>  'image'` - This is the key which we will use next to pull this value out when displaying it on the frontend.
+
+`'description'   =>  esc_html__( 'Slider Background Image', 'text-domain' )` - This lets you pass a description similar to standard Customizer fields.
+
+## How to display repeater on the frontend.
+Step 1: Customizer Repeater comes with a helper function to fetch a repeater fields data.
+
+         $text_slider = get_customizer_values( 'text_slider' );
+
+Just pass it the name you gave the repeater field when you created it.
+
+Step 2: Loop over this array of data and output the values:
 
 To get the input from your control just call it in the normal way:
 
-          $customizer_repeater_example = get_theme_mod('customizer_repeater_example', json_encode( array(/*The content from your default parameter or delete this argument if you don't want a default*/)) );
-          /*This returns a json so we have to decode it*/
-          $customizer_repeater_example_decoded = json_decode($customizer_repeater_example);
-          foreach($customizer_repeater_example_decoded as $repeater_item){
-              echo $repeater_item->icon_value;
-              echo $repeater_item->text;
-              echo $repeater_item->link;
-              echo $repeater_item->image_url;
-              echo $repeater_item->choice;
-              echo $repeater_item->title;
-              echo $repeater_item->subtitle;
-              echo $repeater_item->shortcode;
-              /*Social repeater is also a repeater so we need to decode it*/
-              $social_repeater = json_decode($repeater_item->social_repeater);
-              foreach($social_repeater as $social_repeater){
-                   echo $social_repeater->link;
-                   echo $social_repeater->icon;
-              }
-          }
+          $text_slider = get_customizer_values( 'text_slider' );
+          
+          if ( ! empty( $text_slider ) ) :
+            foreach ( $text_slider as $slide ) {
+                if ( isset( $slide[ 'title' ] ) && ! empty( $slide[ 'title' ] ) ) ) {
+                    echo $slide[ 'title' ]
+                }
+                
+                if ( isset( $slide[ 'link' ] ) && ! empty( $slide[ 'link' ] ) ) ) {
+                    echo $slide[ 'link' ]
+                }
+            }
+          endif;
 
-## Contribute
+## Working with Images.
+Customizer Repeater save the selected image's ID. So when loop through the data you will need to fetch the image url. The benefit to this approach is that it give you complete control of what size images to fetch.
 
-Customizer Repeater is not perfect, but hey, It works! Do you want to make it better? Feel free to fork this and make changes on development branch.
+          $text_slider = get_customizer_values( 'text_slider' );
+          
+          if ( ! empty( $text_slider ) ) :
+            foreach ( $text_slider as $slide ) {
+                if ( isset( $slide[ 'image' ] ) && ! empty( $slide[ 'image' ] ) ) ) {
+                    $url = wp_get_attachment_image_url( $slide[ 'image' ], 'full' );
+                    echo $url;
+                }
+            }
+          endif;
+
+## Roadmap
+* Add more field types (Radio, Checkbox, Select)
+* Allow you to change image upload button text from always being 'Image'
+* Allow the ability to pass custom sanitization callbacks
+* Add Hooks and filter to make repeater more customizable
