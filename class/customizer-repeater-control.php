@@ -98,6 +98,8 @@ class Customizer_Repeater extends WP_Customize_Control {
 	            echo $this->input_control( $control, $values );
             } else if ( 'image' === $control['type'] ) {
                 echo $this->image_control( $control, $values );
+            } else if ( 'radio' === $control['type'] ) {
+	            echo $this->radio_control( $control, $values );
             }
         }
     }
@@ -126,41 +128,6 @@ class Customizer_Repeater extends WP_Customize_Control {
 		}
 	}
 
-	private function get_control_class_name( $type ) {
-		switch ( $type ) {
-			case 'text':
-				return 'customizer-repeater-title-control repeater-value';
-			case 'textarea':
-				return 'customizer-repeater-text-control repeater-value';
-			case 'url':
-				return 'customizer-repeater-link-control repeater-value';
-		}
-    }
-
-	private function icon_picker_control($value = '', $show = ''){ ?>
-		<div class="social-repeater-general-control-icon" <?php if( $show === 'customizer_repeater_image' || $show === 'customizer_repeater_none' ) { echo 'style="display:none;"'; } ?>>
-            <span class="customize-control-title">
-                <?php esc_html_e('Icon','your-textdomain'); ?>
-            </span>
-			<span class="description customize-control-description">
-                <?php
-                echo sprintf(
-	                __( 'Note: Some icons may not be displayed here. You can see the full list of icons at %1$s', 'your-textdomain' ),
-	                sprintf( '<a href="http://fontawesome.io/icons/" rel="nofollow">%s</a>', esc_html__( 'http://fontawesome.io/icons/', 'your-textdomain' ) )
-                ); ?>
-            </span>
-			<div class="input-group icp-container">
-				<input data-placement="bottomRight" class="icp icp-auto" value="<?php if(!empty($value)) { echo esc_attr( $value );} ?>" type="text">
-				<span class="input-group-addon"></span>
-			</div>
-		</div>
-		<?php
-	}
-
-	private function description_exists( $settings ) {
-	    return ( isset( $settings[ 'description' ] ) && ! empty( $settings[ 'description' ] ) );
-    }
-
 	private function image_control( $options, $values ) {
         $value = ( ! empty( $values[ $options['id'] ] ) ) ? $values[ $options['id'] ] : false;
 		$img_url = ( ! empty( $value ) ) ? wp_get_attachment_image_url( absint( $value ), 'medium' ) : false;
@@ -186,77 +153,41 @@ class Customizer_Repeater extends WP_Customize_Control {
 		<?php
 	}
 
-	private function icon_type_choice($value='customizer_repeater_icon'){ ?>
-		<span class="customize-control-title">
-            <?php esc_html_e('Image type','your-textdomain');?>
-        </span>
-		<select class="customizer-repeater-image-choice">
-			<option value="customizer_repeater_icon" <?php selected($value,'customizer_repeater_icon');?>><?php esc_html_e('Icon','your-textdomain'); ?></option>
-			<option value="customizer_repeater_image" <?php selected($value,'customizer_repeater_image');?>><?php esc_html_e('Image','your-textdomain'); ?></option>
-			<option value="customizer_repeater_none" <?php selected($value,'customizer_repeater_none');?>><?php esc_html_e('None','your-textdomain'); ?></option>
-		</select>
-		<?php
-	}
+	private function radio_control( $options, $values ) {
+		$current_value = ( ! empty( $values[$options['id'] ] ) ) ? $values[$options['id'] ] : false; ?>
+        <span class="customize-control-item"><?php echo esc_html( $options['label'] ); ?></span>
+		<?php if ( $this->description_exists( $options ) ) : ?>
+            <span class="customize-control-description">
+                <?php echo esc_html( $options['description'] ); ?>
+            </span>
+		<?php endif; ?>
+		<?php foreach ( $options[ 'choices' ] as $key => $value ) : ?>
+            <label for="<?php echo esc_attr( $options[ 'id' ] ); ?>">
+                <?php echo esc_html( $value ); ?>
+            </label>
+            <input
+                class="customizer-repeater-radio-control repeater-value"
+                type="radio" value="<?php echo esc_html( $key ); ?>"
+                name="<?php echo esc_attr( $options[ 'id' ] ); ?>"
+                data-id="<?php echo esc_attr( $options['id'] ) ?>"
+                <?php checked( $current_value, $key ); ?>
+            />
+        <?php endforeach;
+    }
 
-	private function repeater_control($value = ''){
-		$social_repeater = array();
-		$show_del        = 0; ?>
-		<span class="customize-control-title"><?php esc_html_e( 'Social icons', 'your-textdomain' ); ?></span>
-		<?php
-		if(!empty($value)) {
-			$social_repeater = json_decode( html_entity_decode( $value ), true );
-		}
-		if ( ( count( $social_repeater ) == 1 && '' === $social_repeater[0] ) || empty( $social_repeater ) ) { ?>
-			<div class="customizer-repeater-social-repeater">
-				<div class="customizer-repeater-social-repeater-container">
-					<div class="customizer-repeater-rc input-group icp-container">
-						<input data-placement="bottomRight" class="icp icp-auto" value="<?php if(!empty($value)) { echo esc_attr( $value ); } ?>" type="text">
-						<span class="input-group-addon"></span>
-					</div>
-
-					<input type="text" class="customizer-repeater-social-repeater-link"
-					       placeholder="<?php esc_html_e( 'Link', 'your-textdomain' ); ?>">
-					<input type="hidden" class="customizer-repeater-social-repeater-id" value="">
-					<button class="social-repeater-remove-social-item" style="display:none">
-						<?php esc_html_e( 'X', 'your-textdomain' ); ?>
-					</button>
-				</div>
-				<input type="hidden" id="social-repeater-socials-repeater-colector" class="social-repeater-socials-repeater-colector" value=""/>
-			</div>
-			<button class="social-repeater-add-social-item"><?php esc_html_e( 'Add icon', 'your-textdomain' ); ?></button>
-			<?php
-		} else { ?>
-			<div class="customizer-repeater-social-repeater">
-				<?php
-				foreach ( $social_repeater as $social_icon ) {
-					$show_del ++; ?>
-					<div class="customizer-repeater-social-repeater-container">
-						<div class="customizer-repeater-rc input-group icp-container">
-							<input data-placement="bottomRight" class="icp icp-auto" value="<?php if( !empty($social_icon['icon']) ) { echo esc_attr( $social_icon['icon'] ); } ?>" type="text">
-							<span class="input-group-addon"></span>
-						</div>
-						<input type="text" class="customizer-repeater-social-repeater-link"
-						       placeholder="<?php esc_html_e( 'Link', 'your-textdomain' ); ?>"
-						       value="<?php if ( ! empty( $social_icon['link'] ) ) {
-							       echo esc_url( $social_icon['link'] );
-						       } ?>">
-						<input type="hidden" class="customizer-repeater-social-repeater-id"
-						       value="<?php if ( ! empty( $social_icon['id'] ) ) {
-							       echo esc_attr( $social_icon['id'] );
-						       } ?>">
-						<button class="social-repeater-remove-social-item"
-						        style="<?php if ( $show_del == 1 ) {
-							        echo "display:none";
-						        } ?>"><?php esc_html_e( 'X', 'your-textdomain' ); ?></button>
-					</div>
-					<?php
-				} ?>
-				<input type="hidden" id="social-repeater-socials-repeater-colector"
-				       class="social-repeater-socials-repeater-colector"
-				       value="<?php echo esc_textarea( html_entity_decode( $value ) ); ?>" />
-			</div>
-			<button class="social-repeater-add-social-item"><?php esc_html_e( 'Add icon', 'your-textdomain' ); ?></button>
-			<?php
+	private function get_control_class_name( $type ) {
+		switch ( $type ) {
+			case 'text':
+				return 'customizer-repeater-title-control repeater-value';
+			case 'textarea':
+				return 'customizer-repeater-text-control repeater-value';
+			case 'url':
+				return 'customizer-repeater-link-control repeater-value';
 		}
 	}
+
+	private function description_exists( $settings ) {
+		return ( isset( $settings[ 'description' ] ) && ! empty( $settings[ 'description' ] ) );
+	}
+
 }
