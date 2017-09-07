@@ -11,11 +11,11 @@ Customizer Repeater is a custom control for the WordPress Theme Customizer. It's
 Step 1: Add customizer repeater to composer.json repositories section.
 
          "repositories" : [
-         		{
-         			"type": "vcs",
-         			"url": "https://github.com/mrbobbybryant/customizer-repeater"
-         		}
-         	]
+                  {
+                           "type": "vcs",
+                           "url": "https://github.com/mrbobbybryant/customizer-repeater"
+                  }
+         ]
 
 Step 2: Add Composer Autoload Call to your functions.php if you havn't already.
  
@@ -33,7 +33,7 @@ Step 1: Clone repo into you theme folder.
 
 Step 2: Require root file for customizer-repeater in you `functions.php` file.
 
-         if ( file_exists( get_template_directory() . '/vendor/autoload.php' ) ) {
+         if ( file_exists( get_template_directory() . '/customizer-repeater/customizer-repeater.php' ) ) {
             require_once get_template_directory() . '/customizer-repeater/customizer-repeater.php';
          }
 
@@ -83,7 +83,7 @@ Step 2: Create a control using the Customizer Repeater field.
 * Image/Attachment Upload Field
 
 ### Lets break down one of the controls above.
-`'type' => 'image'` - This is the type of field you want to use.
+`'type' => 'image'` - This is the type of field you want to use. (See list above)
 
 `'label' =>  esc_html__( 'Slide Image', 'text-domain' ),` - This is the label that will appear by the field in the repeater.
 
@@ -100,8 +100,6 @@ Just pass it the name you gave the repeater field when you created it.
 
 Step 2: Loop over this array of data and output the values:
 
-To get the input from your control just call it in the normal way:
-
           $text_slider = get_customizer_values( 'text_slider' );
           
           if ( ! empty( $text_slider ) ) :
@@ -117,7 +115,7 @@ To get the input from your control just call it in the normal way:
           endif;
 
 ## Working with Images.
-Customizer Repeater save the selected image's ID. So when loop through the data you will need to fetch the image url. The benefit to this approach is that it give you complete control of what size images to fetch.
+Customizer Repeater saves the selected image's ID. So when loop through the data you will need to fetch the image url. The benefit to this approach is that it gives you complete control over what size image to fetch.
 
           $text_slider = get_customizer_values( 'text_slider' );
           
@@ -125,13 +123,17 @@ Customizer Repeater save the selected image's ID. So when loop through the data 
             foreach ( $text_slider as $slide ) {
                 if ( isset( $slide[ 'image' ] ) && ! empty( $slide[ 'image' ] ) ) ) {
                     $url = wp_get_attachment_image_url( $slide[ 'image' ], 'full' );
-                    echo $url;
+                    if ( ! empty( $url ) ) {
+                           echo $url;
+                    }
                 }
             }
           endif;
 
 ## Roadmap
-* Add more field types (Radio, Checkbox, Select)
-* Allow you to change image upload button text from always being 'Image'
-* Allow the ability to pass custom sanitization callbacks
-* Add Hooks and filter to make repeater more customizable
+* Add more field types (Radio, Checkbox, Select, etc...)
+* Allow you to change image upload button text from always being 'Image'.
+* Allow the ability to pass custom sanitization callbacks for each control.
+* Add hooks and filter to make repeater more customizable
+* Create autosuggest field.
+* Allow you the abilty to limit the number of repeaters a user can make.
