@@ -74,10 +74,13 @@ class Customizer_Repeater extends WP_Customize_Control {
 		while( $counter < $num_repeaters ) : ?>
             <div class="customizer-repeater-general-control-repeater-container customizer-repeater-draggable">
                 <div class="customizer-repeater-customize-control-title">
-					<?php echo esc_html( $this->repeater_title ); ?>
+                    <span><?php echo esc_html( $this->repeater_title ); ?></span>
+                    <svg x="0px" y="0px" viewBox="0 0 386.257 386.257" style="enable-background:new 0 0 386.257 386.257;" xml:space="preserve">
+                        <polygon points="0,96.879 193.129,289.379 386.257,96.879 "/>
+                    </svg>
                 </div>
-                <div class="customizer-repeater-box-content-hidden">
-					<?php $this->output_repeater_setting( (array) $values[ $counter ] ); ?>
+                <div class="customizer-repeater-box customizer-repeater-box-content-hidden">
+	                    <?php $this->output_repeater_setting( (array) $values[ $counter ] ); ?>
                     <input type="hidden" class="social-repeater-box-id" value="<?php if ( ! empty( $this->id ) ) {
 						echo esc_attr( $this->id );
 					} ?>">
@@ -110,24 +113,32 @@ class Customizer_Repeater extends WP_Customize_Control {
 	    $class = $this->get_control_class_name( $options[ 'type' ] );
 	    $value = ( ! empty( $values[$options['id'] ] ) ) ? $values[$options['id'] ] : false;
 	    ?>
-		<span class="customize-control-item"><?php echo esc_html( $options['label'] ); ?></span>
-		<?php
-		if( $options['type'] === 'textarea' ){ ?>
-			<textarea
-                class="<?php echo esc_attr( $class ); ?>"
-                placeholder="<?php echo esc_attr( $options['label'] ); ?>"
-                data-id="<?php echo esc_attr( $options['id'] ) ?>"><?php echo ( ! empty($options['sanitize_callback'] ) ?  call_user_func_array( $options['sanitize_callback'], array( $value ) ) : esc_attr($value) ); ?></textarea>
-			<?php
-		} else { ?>
-            <input
-                type="text"
-                value="<?php echo esc_attr( $value ); ?>"
-                class="<?php echo esc_attr( $class ); ?>"
-                placeholder="<?php echo esc_attr( $options['label'] ); ?>"
-                data-id="<?php echo esc_attr( $options['id'] ) ?>"
-            />
-			<?php
-		}
+        <div class="customizer-control">
+            <span class="customize-control-title"><?php echo esc_html( $options['label'] ); ?></span>
+	        <?php if ( $this->description_exists( $options ) ) : ?>
+                <span class="customize-control-description">
+                <?php echo esc_html( $options['description'] ); ?>
+            </span>
+	        <?php endif; ?>
+            <?php
+            if( $options['type'] === 'textarea' ){ ?>
+                <textarea
+                    class="<?php echo esc_attr( $class ); ?>"
+                    placeholder="<?php echo esc_attr( $options['label'] ); ?>"
+                    data-id="<?php echo esc_attr( $options['id'] ) ?>"><?php echo ( ! empty($options['sanitize_callback'] ) ?  call_user_func_array( $options['sanitize_callback'], array( $value ) ) : esc_attr($value) ); ?></textarea>
+                <?php
+            } else { ?>
+                <input
+                    type="text"
+                    value="<?php echo esc_attr( $value ); ?>"
+                    class="<?php echo esc_attr( $class ); ?>"
+                    placeholder="<?php echo esc_attr( $options['label'] ); ?>"
+                    data-id="<?php echo esc_attr( $options['id'] ) ?>"
+                />
+                <?php
+            } ?>
+		</div>
+        <?php
 	}
 
 	private function image_control( $options, $values ) {
@@ -136,7 +147,7 @@ class Customizer_Repeater extends WP_Customize_Control {
         $hidden = ( ! empty( $img_url ) ) ? '' : 'display:none;';
         $upload_value = ( ! empty( $img_url ) ) ? esc_html__('Replace Image' ) : esc_html__( 'Upload Image' );
     ?>
-		<div class="customizer-repeater-image-control">
+		<div class="customizer-repeater-image-control customizer-control">
             <span class="customize-control-title">
                 <?php echo esc_html( $options['label'] ); ?>
             </span>
@@ -157,41 +168,46 @@ class Customizer_Repeater extends WP_Customize_Control {
 
 	private function radio_control( $options, $values ) {
 		$current_value = ( ! empty( $values[$options['id'] ] ) ) ? $values[$options['id'] ] : false; ?>
-        <span class="customize-control-item"><?php echo esc_html( $options['label'] ); ?></span>
-		<?php if ( $this->description_exists( $options ) ) : ?>
-            <span class="customize-control-description">
-                <?php echo esc_html( $options['description'] ); ?>
-            </span>
-		<?php endif; ?>
-		<?php foreach ( $options[ 'choices' ] as $key => $value ) : ?>
-            <label for="<?php echo esc_attr( $options[ 'id' ] ); ?>">
-                <?php echo esc_html( $value ); ?>
-            </label>
-            <input
-                class="customizer-repeater-radio-control repeater-value"
-                type="radio" value="<?php echo esc_html( $key ); ?>"
-                name="<?php echo esc_attr( $options[ 'id' ] ); ?>"
-                data-id="<?php echo esc_attr( $options['id'] ) ?>"
-                <?php checked( $current_value, $key ); ?>
-            />
-        <?php endforeach;
+        <div class="customizer-control">
+            <span class="customize-control-title"><?php echo esc_html( $options['label'] ); ?></span>
+            <?php if ( $this->description_exists( $options ) ) : ?>
+                <span class="customize-control-description">
+                    <?php echo esc_html( $options['description'] ); ?>
+                </span>
+            <?php endif; ?>
+            <?php foreach ( $options[ 'choices' ] as $key => $value ) : ?>
+                <label for="<?php echo esc_attr( $options[ 'id' ] ); ?>">
+                    <?php echo esc_html( $value ); ?>
+                </label>
+                <input
+                    class="customizer-repeater-radio-control repeater-value"
+                    type="radio" value="<?php echo esc_html( $key ); ?>"
+                    name="<?php echo esc_attr( $options[ 'id' ] ); ?>"
+                    data-id="<?php echo esc_attr( $options['id'] ) ?>"
+                    <?php checked( $current_value, $key ); ?>
+                />
+            <?php endforeach; ?>
+        </div>
+        <?php
     }
 
 	private function select_control( $options, $values ) {
 		$current_value = ( ! empty( $values[$options['id'] ] ) ) ? $values[$options['id'] ] : false; ?>
-        <span class="customize-control-item"><?php echo esc_html( $options['label'] ); ?></span>
-		<?php if ( $this->description_exists( $options ) ) : ?>
-            <span class="customize-control-description">
-                <?php echo esc_html( $options['description'] ); ?>
-            </span>
-		<?php endif; ?>
-        <select data-id="<?php echo esc_attr( $options['id'] ) ?>" class="customizer-repeater-select-control repeater-value">
-		<?php foreach ( $options[ 'choices' ] as $key => $value ) : ?>
-            <option value="<?php echo esc_attr( $key ) ?>" <?php selected( $current_value, $key ); ?>>
-                <?php echo esc_html( $value ) ?>
-            </option>
-		<?php endforeach; ?>
-		</select>
+        <div class="customizer-control">
+            <span class="customize-control-title"><?php echo esc_html( $options['label'] ); ?></span>
+            <?php if ( $this->description_exists( $options ) ) : ?>
+                <span class="customize-control-description">
+                    <?php echo esc_html( $options['description'] ); ?>
+                </span>
+            <?php endif; ?>
+            <select data-id="<?php echo esc_attr( $options['id'] ) ?>" class="customizer-repeater-select-control repeater-value">
+            <?php foreach ( $options[ 'choices' ] as $key => $value ) : ?>
+                <option value="<?php echo esc_attr( $key ) ?>" <?php selected( $current_value, $key ); ?>>
+                    <?php echo esc_html( $value ) ?>
+                </option>
+            <?php endforeach; ?>
+            </select>
+        </div>
         <?php
 	}
 

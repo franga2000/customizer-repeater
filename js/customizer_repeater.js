@@ -157,11 +157,17 @@ jQuery(document).ready(function () {
     'use strict';
     var theme_conrols = jQuery('#customize-theme-controls');
     theme_conrols.on('click', '.customizer-repeater-customize-control-title', function () {
-        jQuery(this).next().slideToggle('medium', function () {
-            if (jQuery(this).is(':visible')){
-                jQuery(this).css('display', 'block');
-            }
-        });
+        // jQuery(this).next().slideToggle('medium', function () {
+        //     if (jQuery(this).is(':visible')){
+        //         jQuery(this).css('display', 'block');
+        //     }
+        // });
+        //
+        var repeaterEl = jQuery(this);
+        var parent = repeaterEl[0].parentElement;
+        var sibling = parent.querySelector( '.customizer-repeater-box' );
+        sibling.classList.toggle( 'customizer-repeater-box-content-hidden' );
+        parent.classList.toggle( 'customizer-section-open' );
     });
 
     theme_conrols.on('change', '.icp',function(){
