@@ -94,12 +94,14 @@ class Customizer_Repeater extends WP_Customize_Control {
 	private function output_repeater_setting( $values ) {
 	    $text_controls = [ 'text', 'textarea', 'url' ];
         foreach( $this->controls as $control ) {
-            if ( in_array( $control['type'], $text_controls ) ) {
+            if ( in_array( $control[ 'type' ], $text_controls ) ) {
 	            echo $this->input_control( $control, $values );
-            } else if ( 'image' === $control['type'] ) {
+            } else if ( 'image' === $control[ 'type' ] ) {
                 echo $this->image_control( $control, $values );
-            } else if ( 'radio' === $control['type'] ) {
+            } else if ( 'radio' === $control[ 'type' ] ) {
 	            echo $this->radio_control( $control, $values );
+            } else if ( 'select' === $control[ 'type' ] ) {
+	            echo $this->select_control( $control, $values );
             }
         }
     }
@@ -174,6 +176,24 @@ class Customizer_Repeater extends WP_Customize_Control {
             />
         <?php endforeach;
     }
+
+	private function select_control( $options, $values ) {
+		$current_value = ( ! empty( $values[$options['id'] ] ) ) ? $values[$options['id'] ] : false; ?>
+        <span class="customize-control-item"><?php echo esc_html( $options['label'] ); ?></span>
+		<?php if ( $this->description_exists( $options ) ) : ?>
+            <span class="customize-control-description">
+                <?php echo esc_html( $options['description'] ); ?>
+            </span>
+		<?php endif; ?>
+        <select data-id="<?php echo esc_attr( $options['id'] ) ?>" class="customizer-repeater-select-control repeater-value">
+		<?php foreach ( $options[ 'choices' ] as $key => $value ) : ?>
+            <option value="<?php echo esc_attr( $key ) ?>" <?php selected( $current_value, $key ); ?>>
+                <?php echo esc_html( $value ) ?>
+            </option>
+		<?php endforeach; ?>
+		</select>
+        <?php
+	}
 
 	private function get_control_class_name( $type ) {
 		switch ( $type ) {

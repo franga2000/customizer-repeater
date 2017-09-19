@@ -293,6 +293,10 @@ jQuery(document).ready(function () {
         customizer_repeater_refresh_general_control_values();
     });
 
+    theme_conrols.on('change', '.customizer-repeater-select-control', function (e) {
+        customizer_repeater_refresh_general_control_values();
+    });
+
     theme_conrols.on('keyup', '.customizer-repeater-link-control', function () {
         customizer_repeater_refresh_general_control_values();
     });
