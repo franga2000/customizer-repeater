@@ -7,6 +7,7 @@ class Customizer_Repeater extends WP_Customize_Control {
 
 	public $id;
 	private $repeater_title = array();
+    private $max = false;
 	private $controls;
 
 	/*Class constructor*/
@@ -14,7 +15,16 @@ class Customizer_Repeater extends WP_Customize_Control {
 		parent::__construct( $manager, $id, $args );
 		/*Get options from customizer.php*/
 
-		if ( ! isset( $this->label ) || empty( $this->label ) ) {
+        if ( isset( $args['max'] ) || ! empty( $args['max'] ) ) {
+            if ( ! is_numeric( $args['max'] ) ) {
+                throw new Exception( 'Customizer  Repeater expects Max argument to be a number.' );
+            }
+
+            $this->max = $args['max'];
+        }
+
+
+        if ( ! isset( $this->label ) || empty( $this->label ) ) {
 		    throw new Exception( 'Missing Label Field for Customizer Repeater' );
         }
 
@@ -53,6 +63,9 @@ class Customizer_Repeater extends WP_Customize_Control {
 
 		/*Decode values*/
 		$values = json_decode( $values );
+
+        $disabled = ( count( $values ) === $this->max ) ? 'disabled' : '';
+        $max = ( $this->max ) ? sprintf('data-max="%s"', $this->max ) : '';
         ?>
 
 		<span class="customize-control-title"><?php echo esc_html( $this->label ); ?></span>
@@ -62,7 +75,7 @@ class Customizer_Repeater extends WP_Customize_Control {
                    id="customizer-repeater-<?php echo $this->id; ?>-colector" <?php $this->link(); ?>
                    class="customizer-repeater-colector"/>
 			</div>
-		<button type="button" class="button add_field customizer-repeater-new-field">
+		<button type="button" class="button add_field customizer-repeater-new-field" <?php echo $max;?> <?php echo $disabled;?>>
 			<?php esc_html_e( 'Add new field', 'your-textdomain' ); ?>
 		</button>
 		<?php
