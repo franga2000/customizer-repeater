@@ -263,7 +263,22 @@ jQuery(document).ready(function () {
         } );
 
         /*Append new box*/
-        parent.appendChild(newRepeater);
+
+        var count = parent.querySelectorAll('.customizer-repeater-general-control-repeater-container').length;
+        var max = element.dataset.max;
+
+        if (max) {
+            if ( count < max ) {
+                /*Append new box*/
+                parent.appendChild(newRepeater);
+            }
+
+            if ( count + 1 === parseInt( max ) ) {
+                element.disabled = true;
+            }
+        } else {
+            parent.appendChild(newRepeater);
+        }
 
         /*Refresh values*/
         customizer_repeater_refresh_general_control_values();
@@ -272,8 +287,23 @@ jQuery(document).ready(function () {
 
     theme_conrols.on('click', '.social-repeater-general-control-remove-field', function () {
         if (typeof    jQuery(this).parent() !== 'undefined') {
+            var button = jQuery(this);
             jQuery(this).parent().parent().remove();
             customizer_repeater_refresh_general_control_values();
+            //If disabled and under max then set disabled false
+
+            var openPanel = document.querySelectorAll('.customize-pane-child.open');
+            var parent = openPanel[0].querySelector('.customizer-repeater-general-control-repeater');
+            var addButton = parent.nextElementSibling;
+
+            var count = parent.querySelectorAll('.customizer-repeater-general-control-repeater-container').length;
+            var max = addButton.dataset.max;
+
+            if ( addButton.disabled && count + 1 === parseInt( max ) ) {
+                addButton.disabled = false;
+            }
+
+
         }
         return false;
     });
