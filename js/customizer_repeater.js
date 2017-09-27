@@ -292,15 +292,15 @@ jQuery(document).ready(function () {
             customizer_repeater_refresh_general_control_values();
             //If disabled and under max then set disabled false
 
-            var parent = button.closest( '.customizer-repeater-general-control-droppable' );
-            console.log( parent );
+            var openPanel = document.querySelectorAll('.customize-pane-child.open');
+            var parent = openPanel[0].querySelector('.customizer-repeater-general-control-repeater');
             var addButton = parent.nextElementSibling;
 
             var count = parent.querySelectorAll('.customizer-repeater-general-control-repeater-container').length;
-            var max = element.dataset.max;
-            console.log(count);
-            if ( addButton.disabled && count === max ) {
-                addButton.disabled = fasle;
+            var max = addButton.dataset.max;
+
+            if ( addButton.disabled && count + 1 === parseInt( max ) ) {
+                addButton.disabled = false;
             }
 
 
