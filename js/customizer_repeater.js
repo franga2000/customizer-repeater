@@ -7,18 +7,34 @@ function media_upload(button_class) {
         var parent = jQuery(this).parent();
         var display_field = jQuery(this).parent().find('.custom-media-url');
         var image = parent[0].querySelector( 'img' );
+
+        var file = parent[0].querySelector('p');
+        var replaceBtn = parent[0].querySelector('.replace_button');
+
         var uploadBtn = parent[0].querySelector('.customizer-repeater-custom-media-button');
         var removeButton = parent[0].querySelector('.customizer-repeater-custom-media-remove');
 
         wp.media.editor.send.attachment = function (props, attachment) {
-            image.setAttribute( 'src', attachment.url );
+
+
+          var video = attachment.url.indexOf('mp4');
+          if (video < 0) {
+            image.setAttribute('src', attachment.url);
             image.style.display = 'block';
+            file.style.display = 'none';
+          } else {
+            file.style.display = 'block';
+            image.style.display = 'none';
+            file.innerHTML = attachment.name;
+          }
 
-            removeButton.style.display = 'inline-block';
-            uploadBtn.value = 'Replace Image';
+          uploadBtn.style.display = 'none';
+          replaceBtn.style.display = 'inline-block';
+          removeButton.style.display = 'inline-block';
+          display_field.val(attachment.id);
+          display_field.trigger('change');
 
-            display_field.val(attachment.id);
-            display_field.trigger('change');
+            
         };
         wp.media.editor.open(button_class);
         window.send_to_editor = function (html) {
@@ -201,17 +217,20 @@ jQuery(document).ready(function () {
     theme_conrols.on('click', '.customizer-repeater-custom-media-remove', function () {
         var parent = jQuery(this).parent();
         var image = parent.find( 'img' );
-        var hidden = parent.find( '.custom-media-url' );
+        var file = parent.find('p');
+        var hidden = parent.find('.custom-media-url');
         var uploadBtn = parent.find('.customizer-repeater-custom-media-button');
-        var removeBtn = uploadBtn.next();
+        var removeBtn = parent.find('.customizer-repeater-custom-media-remove');
+        var replaceBtn = parent.find('.replace_button');
 
-        image[0].setAttribute( 'src' , '');
-        image[0].style.display = 'none';
-
+        file[0].style.display = 'none';
+        image[0].setAttribute('src', '');
+        uploadBtn[0].style.display = 'block';
+      
+        replaceBtn[0].style.display = 'none';
         removeBtn[0].style.display = 'none';
 
-        uploadBtn[0].value = 'Upload Image';
-
+        image[0].style.display = 'none';
         hidden[0].value = '';
         hidden.trigger('change');
     });
@@ -250,15 +269,30 @@ jQuery(document).ready(function () {
           field.value = '';
 
           if ( field.classList.contains( 'custom-media-url' ) ) {
-            var imageParent = field.parentNode;
-            var image = imageParent.querySelector('img');
-            var uploadBtn = imageParent.querySelector('.customizer-repeater-custom-media-button');
-            var cancelBtn = imageParent.querySelector('.customizer-repeater-custom-media-remove');
+              var imageParent = field.parentNode;
+              var image = imageParent.querySelector('img');
+              var file = imageParent.querySelector('p');
+              var uploadBtn = imageParent.querySelector(
+                '.customizer-repeater-custom-media-button',
+              );
+              var cancelBtn = imageParent.querySelector(
+                '.customizer-repeater-custom-media-remove',
+              );
+              var replaceBtn = imageParent.querySelector(
+                '.replace_button',
+              );
 
-            image.setAttribute('src', '');
-            image.style.display = 'none';
-            uploadBtn.value = 'Upload Image';
-            cancelBtn.style.display = 'none';
+              //HERE
+              
+              file.style.display = 'none';
+              file.innerHTML = '';
+              image.setAttribute('src', '');
+              image.style.display = 'none';
+
+
+              uploadBtn.style.display = 'inline-block';
+              replaceBtn.style.display = "none";
+              cancelBtn.style.display = 'none';
           }
         } );
 
