@@ -1,7 +1,7 @@
 {
   "name": "customizer-repeater",
   "description": "A Custom Repeater Field for the WordPress Customizer.",
-  "version": "0.1.0",
+  "version": "0.5.0",
   "type": "library",
   "keywords": [],
   "homepage": "https://github.com/mrbobbybryant/customizer-repeater",
