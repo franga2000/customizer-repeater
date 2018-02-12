@@ -159,6 +159,10 @@ class Customizer_Repeater extends WP_Customize_Control {
 		$img_url = ( ! empty( $value ) ) ? wp_get_attachment_image_url( absint( $value ), 'medium' ) : false;
         $hidden = ( ! empty( $img_url ) ) ? '' : 'display:none;';
         $upload_value = ( ! empty( $img_url ) ) ? esc_html__('Replace Image' ) : esc_html__( 'Upload Image' );
+
+        $file_name = ( ! empty( $value ) ) ? basename( get_attached_file( $value ) ) : false;
+        $file_ext = wp_check_filetype( $file_name );
+        $hidden_name = ( $file_ext['ext'] === 'mp4' ) ? '' : 'display:none;';
     ?>
 		<div class="customizer-repeater-image-control customizer-control">
             <span class="customize-control-title">
@@ -170,11 +174,18 @@ class Customizer_Repeater extends WP_Customize_Control {
             </span>
             <?php endif; ?>
             <div class="customizer-repeater-image-wrapper">
+                
+                <p class="txt" style="<?php echo $hidden_name;  ?>"><?php echo $file_name; ?></p>
                 <img src="<?php echo esc_url( $img_url ); ?>" alt="" style="<?php echo $hidden;  ?>">
             </div>
-			<input type="hidden" class="widefat custom-media-url repeater-value" value="<?php echo esc_attr( $value ); ?>" data-id="<?php echo esc_attr( $options['id'] ) ?>">
-			<input type="button" class="button button-primary customizer-repeater-custom-media-button" value="<?php echo esc_attr( $upload_value ); ?>" />
-		    <input type="button" class="button customizer-repeater-custom-media-remove" value="<?php esc_html_e( 'Remove Image' ); ?>" style="<?php echo ( empty( $img_url ) ) ? 'display:none;' : ''; ?>" />
+
+            <input type="hidden" class="widefat custom-media-url repeater-value" value="<?php echo esc_attr( $value ); ?>" data-id="<?php echo esc_attr( $options['id'] ) ?>">
+
+            <input type="button" class="button button-primary customizer-repeater-custom-media-button" style="<?php echo ( empty( $value ) ) ? '' : 'display:none'; ?>" value="<?php echo esc_attr( $options['upload_button'] ); ?>" />
+
+            <input type="button" class="button button-primary customizer-repeater-custom-media-button replace_button" style="<?php echo ( empty( $value ) ) ? 'display:none;' : ''; ?>" value="<?php echo esc_attr( $options['replace_button'] ); ?>" />
+
+            <input type="button" class="button customizer-repeater-custom-media-remove" value="<?php esc_html_e( $options['remove_button']); ?>" style="<?php echo ( empty( $value ) ) ? 'display:none;' : ''; ?>" />
 		</div>
 		<?php
 	}
