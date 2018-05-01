@@ -1,4 +1,9 @@
 <?php
+
+if ( !defined('ABSPATH') ) {
+	return;
+}
+
 if ( ! defined( 'CUSTOMIZER_REPEATER_DIR' ) ) {
 	define( 'CUSTOMIZER_REPEATER_DIR', dirname( __FILE__ ) );
 }
@@ -12,7 +17,7 @@ if ( ! defined( 'CUSTOMIZER_REPEATER_FILE' ) ) {
 }
 
 if ( ! defined( 'CUSTOMIZER_REPEATER_VERSION' ) ) {
-	define( 'CUSTOMIZER_REPEATER_VERSION', '0.5.0' );
+	define( 'CUSTOMIZER_REPEATER_VERSION', '0.6.0' );
 }
 
 function customizer_repeater_register( $wp_customize ) {
