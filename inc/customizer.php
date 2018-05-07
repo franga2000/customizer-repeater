@@ -1,5 +1,10 @@
 <?php
 
+if ( ! defined('ABSPATH') ) {
+	exit;
+}
+
+
 function customizer_repeater_sanitize($input){
 	$input_decoded = json_decode($input,true);
 

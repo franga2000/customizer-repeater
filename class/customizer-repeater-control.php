@@ -1,4 +1,8 @@
 <?php
+if ( ! defined('ABSPATH') ) {
+	exit;
+}
+
 if ( ! class_exists( 'WP_Customize_Control' ) ) {
 	return null;
 }
@@ -43,17 +47,46 @@ class Customizer_Repeater extends WP_Customize_Control {
 
 	/*Enqueue resources for the control*/
 	public function enqueue() {
-		wp_enqueue_style( 'customizer-repeater-font-awesome', CUSTOMIZER_REPEATER_URL .'/customizer-repeater/css/font-awesome.min.css','1.0.0' );
+		wp_enqueue_style(
+            'customizer-repeater-font-awesome',
+            plugins_url( '/customizer-repeater/css/font-awesome.min.css', __DIR__ ),
+            '1.0.0'
+        );
 
-		wp_enqueue_style( 'customizer-repeater-admin-stylesheet', CUSTOMIZER_REPEATER_URL .'/customizer-repeater/css/admin-style.css','1.0.0' );
+		wp_enqueue_style(
+            'customizer-repeater-admin-stylesheet',
+            plugins_url( '/customizer-repeater/css/admin-style.css', __DIR__ ),
+            '1.0.0'
+        );
 
-		wp_enqueue_script( 'customizer-repeater-script', CUSTOMIZER_REPEATER_URL . '/customizer-repeater/js/customizer_repeater.js', array('jquery', 'jquery-ui-draggable' ), '1.0.1', true  );
+		wp_enqueue_script(
+            'customizer-repeater-script',
+            plugins_url( '/customizer-repeater/js/customizer_repeater.js', __DIR__ ),
+            array('jquery', 'jquery-ui-draggable' ),
+            '1.0.1',
+            true
+        );
 
-		wp_enqueue_script( 'customizer-repeater-fontawesome-iconpicker', CUSTOMIZER_REPEATER_URL . '/customizer-repeater/js/fontawesome-iconpicker.min.js', array( 'jquery' ), '1.0.0', true );
+		wp_enqueue_script(
+            'customizer-repeater-fontawesome-iconpicker',
+            plugins_url( '/customizer-repeater/js/fontawesome-iconpicker.min.js' ),
+            array( 'jquery' ),
+            '1.0.0',
+            true
+        );
 
-		wp_enqueue_script( 'customizer-repeater-iconpicker-control', CUSTOMIZER_REPEATER_URL . '/customizer-repeater/js/iconpicker-control.js', array( 'jquery' ), '1.0.0', true );
+		wp_enqueue_script(
+            'customizer-repeater-iconpicker-control',
+            plugins_url( '/customizer-repeater/js/iconpicker-control.js' ),
+            array( 'jquery' ),
+            '1.0.0',
+            true
+        );
 
-		wp_enqueue_style( 'customizer-repeater-fontawesome-iconpicker-script', CUSTOMIZER_REPEATER_URL . '/customizer-repeater/css/fontawesome-iconpicker.min.css' );
+		wp_enqueue_style(
+            'customizer-repeater-fontawesome-iconpicker-script',
+            plugins_url( '/customizer-repeater/css/fontawesome-iconpicker.min.css' )
+        );
 	}
 
 	public function render_content() {

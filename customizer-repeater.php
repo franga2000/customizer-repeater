@@ -1,7 +1,17 @@
 <?php
+/*
+Plugin Name:  Customizer Repeater
+Plugin URI:   https://github.com/mrbobbybryant/customizer-repeater
+Description:  A Custom Repeater Field for the WordPress Customizer.
+Version:      1.0.0
+Author:       Bobby Bryant
+Author URI:   https://github.com/mrbobbybryant
+License:      GPL2
+License URI:  https://www.gnu.org/licenses/gpl-2.0.html
+*/
 
-if ( !defined('ABSPATH') ) {
-	return;
+if ( ! defined('ABSPATH') ) {
+	exit;
 }
 
 if ( ! defined( 'CUSTOMIZER_REPEATER_DIR' ) ) {
@@ -17,7 +27,7 @@ if ( ! defined( 'CUSTOMIZER_REPEATER_FILE' ) ) {
 }
 
 if ( ! defined( 'CUSTOMIZER_REPEATER_VERSION' ) ) {
-	define( 'CUSTOMIZER_REPEATER_VERSION', '0.6.0' );
+	define( 'CUSTOMIZER_REPEATER_VERSION', '1.0.0' );
 }
 
 function customizer_repeater_register( $wp_customize ) {
